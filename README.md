@@ -1,2 +1,5 @@
+
 # Module utis
-Un module utile dans différents projets pour 
+
+Un pseudo module pour gérer les vecteurs et les positions et les angles
+
