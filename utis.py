@@ -40,21 +40,26 @@ class Vec:
         if 'x' in args:
             self.x=args['x']
             self.y=args['y']
-            self.angle=math.atan2(self.y,self.x)
+            self._angle=math.atan2(self.y,self.x)
             self.long=Pos(0,0).dist(Pos(self.x,self.y))
         elif 'long' in args:
-            self.angle=args.get('angle',0)
+            self._angle=args.get('angle',0)
             self.long=args.get('long',1)
             self.x=math.cos(self.angle)*self.long
             self.y=math.sin(self.angle)*self.long
         else:
-            self.angle=args['pa'].angle(args['pb'])
+            self._angle=args['pa'].angle(args['pb'])
             self.long=args['pa'].dist(args['pb'])
             self.x=math.cos(self.angle)*self.long
             self.y=math.sin(self.angle)*self.long
-    def update(self):
-        self.x=math.cos(self.angle)*self.long
-        self.y=math.sin(self.angle)*self.long
+    @property
+    def angle(self):
+        return self._angle
+    @angle.setter
+    def angle(self,val):
+        self._angle=val
+        self.x=round(math.cos(self.angle)*self.long,9)
+        self.y=round(math.sin(self.angle)*self.long,9)
     def pointtoo(self,form:Pos,to:Pos):
         self.angle=form.angle(to)
         self.update()
@@ -71,11 +76,13 @@ class Vec:
     def __floordiv__(self,other):
         print(self,other)
         return Vec(self.x/other,self.y/other)
+    def draw(self,pg,fen,pos):
+        pg.draw.line(fen,0xff00ff,pos.pourpg(),(pos+self).pourpg())
     def __repr__(self):
         ang=(self.angle/math.pi).as_integer_ratio()
         return 'Vecteur :'+' x = '+str(self.x)+' y = '+str(self.y)+\
                ' angle = '+str(ang[0])+'pi/'+str(ang[1])+' long = '+str(self.long)
 if __name__=="__main__":
-    a=Vec(x=1,y=2)
+    a=Vec(x=1,y=0)
     b=Vec(long=1,angle=math.tau)
             
