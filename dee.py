@@ -1,7 +1,8 @@
-class Table:
+from random import random
 
+class Table:
     def __init__(self):
-        self.list=[[None]]
+        self.list=[[0]]
         self.xmax=0
         self.ymax=0
 
@@ -13,13 +14,13 @@ class Table:
         else:
             print(f"Bad index for type Table: {val}")
     def __setitem__(self,pos,value):
-        if pos[0]>self.xmax:
+        if pos[0]>=self.xmax:
             for ind,xs in enumerate(self.list):
-                self.list[ind]=xs+[None for i in range(pos[0]-self.xmax)]
+                self.list[ind]=xs+[0 for i in range(pos[0]-self.xmax)]
             self.xmax=len(self.list[0])
-        if pos[1]>self.ymax:
+        if pos[1]>=self.ymax:
             for i in range(pos[1]-self.ymax):
-                self.list.append([None for i in range(self.xmax)])
+                self.list.append([0 for i in range(self.xmax)])
             self.ymax=len(self.list)
         self.list[pos[1]][pos[0]]=value
 
@@ -28,6 +29,22 @@ class Table:
         for y in self.list:t+=str(y)+"\n" 
         #t+=f"Width: {self.xmax} items Height: {self.ymax} items"
         return t
+    def __iter__(self):
+        self.av=[0,0]
+        return self
+    def __next__(self):
+        res=self.av[:]
+        if self.av=="ended":
+                raise StopIteration
+        self.av[0]+=1
+        if self.av[0]>=self.xmax:
+            self.av[0]=0
+            self.av[1]+=1
+            if self.av[1]>=self.ymax:
+                self.av="ended"
+                return self[-1,-1],res
+        return self[res[0],res[1]],res
+            
 class Plan:
 
     def __init__(self):
@@ -68,6 +85,8 @@ class Plan:
         #t+=f"Width: {self.xmax} items Height: {self.ymax} items"
         return t
 
-T=Table()
+
 S=Plan()
-T[10,10]=10
+T=Table()
+T[10,10]="bout"
+
