@@ -1,4 +1,3 @@
-from random import random
 
 class Table:
     def __init__(self):
