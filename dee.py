@@ -46,8 +46,9 @@ class Table:
             
 class Plan:
 
-    def __init__(self):
-        self.list=[[0]]
+    def __init__(self,default=0):
+        self.default=default
+        self.list=[[self.default]]
         self.xinter=[0,0]
         self.yinter=[0,0]
 
@@ -62,15 +63,15 @@ class Plan:
         if not self.xinter[0]<x<self.xinter[1]:
             if x<self.xinter[0]:
                 for ligne in range(len(self.list)):
-                    self.list[ligne]=[None for to_add_before in range(abs(x-self.xinter[0]))]+self.list[ligne]
+                    self.list[ligne]=[self.default for to_add_before in range(abs(x-self.xinter[0]))]+self.list[ligne]
                 self.xinter[0]-=abs(x-self.xinter[0])
             if self.xinter[1]<x:
                 for ligne in range(len(self.list)):
-                    self.list[ligne]=self.list[ligne]+[None for to_add_after in range(x-self.xinter[1])]
+                    self.list[ligne]=self.list[ligne]+[self.default for to_add_after in range(x-self.xinter[1])]
                 self.xinter[1]+=abs(x-self.xinter[1])+1
                 
         if not self.yinter[0]<y<self.yinter[1]:
-            emptyline=[None for x in range(abs(self.xinter[0])+self.xinter[1])]
+            emptyline=[self.default for x in range(abs(self.xinter[0])+self.xinter[1])]
             if y<self.yinter[0]:
                 self.list=[emptyline[:] for y in range(abs(y-self.yinter[0]))]+self.list
                 self.yinter[0]-=abs(y-self.yinter[0])
@@ -83,9 +84,23 @@ class Plan:
         for y in self.list:t+=str(y)+"\n"
         #t+=f"Width: {self.xmax} items Height: {self.ymax} items"
         return t
+    def __iter__(self):
+        self.av=[self.xinter[0],self.yinter[0]]
+        return self
+    def __next__(self):
+        if self.av=="end":
+            raise StopIteration
+        else:
+            res=self[self.av[0],self.av[1]],self.av[:]
+            self.av[0]+=1
+            if self.av[0]>self.xinter[1]:
+                self.av[1]+=1
+                if self.av[1]>self.yinter[1]:
+                    self.av='end'
+        return res
+            
 
-
-S=Plan()
+S=Plan(None)
 T=Table()
 T[10,10]="bout"
 
