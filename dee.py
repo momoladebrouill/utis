@@ -1,33 +1,43 @@
 
 class Table:
-    def __init__(self):
-        self.list=[[0]]
-        self.xmax=0
-        self.ymax=0
+    def __init__(self,size=(0,0),default=lambda x,y:(x,y)):
+        self.list=[[]]
+        self.default=default
+        self.addcolumn(size[0])
+        self.addline(size[1]-1)
 
     def __getitem__(self,val):
-        if type(val)==tuple:
+        try:
             return self.list[val[1]][val[0]]
-        elif type(val)==int:
-            return self.list[val]
-        else:
-            print(f"Bad index for type Table: {val}")
+        except TypeError:
+            if type(val)==int:
+                return self.list[val]
+            else:
+                raise
+            
     def __setitem__(self,pos,value):
         if pos[0]>=self.xmax:
-            for ind,xs in enumerate(self.list):
-                self.list[ind]=xs+[0 for i in range(pos[0]-self.xmax)]
-            self.xmax=len(self.list[0])
+            self.addcolumn(pos[0]-self.xmax+1)
         if pos[1]>=self.ymax:
-            for i in range(pos[1]-self.ymax):
-                self.list.append([0 for i in range(self.xmax)])
-            self.ymax=len(self.list)
+            self.addline(pos[1]-self.ymax)
         self.list[pos[1]][pos[0]]=value
+        
+    def addcolumn(self,nb=1):
+        for y in range(self.ymax+1):# For each line
+                self.list[y]+=[self.default(x,y) for x in range(nb)] # Ajouter nb colone(s)
+                
+    def addline(self,nb=1):
+        for y in range(self.ymax+1,self.ymax+nb+1):# Pour each nouvelle line
+            self.list.append([self.default(x,y) for x in range(self.xmax+1)]) # en créer une
+    
 
     def __repr__(self):
         t=""
-        for y in self.list:t+=str(y)+"\n" 
-        #t+=f"Width: {self.xmax} items Height: {self.ymax} items"
-        return t
+        for y in self.list:
+            for x in y:
+                t+=str(x)+"\t" 
+        #t+=f"{self.xmax= } {self.ymax= }"
+        return t[:-1]
     def __iter__(self):
         self.av=[0,0]
         return self
@@ -36,56 +46,95 @@ class Table:
         if self.av=="ended":
                 raise StopIteration
         self.av[0]+=1
-        if self.av[0]>=self.xmax:
+        if self.av[0]>self.xmax:
             self.av[0]=0
             self.av[1]+=1
-            if self.av[1]>=self.ymax:
+            if self.av[1]>self.ymax:
                 self.av="ended"
                 return self[-1,-1],res
         return self[res[0],res[1]],res
-            
+    
+    @property
+    def xmax(self):
+        try:
+            val=len(self.list[0])
+            return val-1 if val>0 else  0
+        except IndexError:
+            return 0
+    
+    @property
+    def ymax(self):
+        val=len(self.list)
+        return val-1 if val>0 else  0
+
+
+
+T=Table(default=lambda x,y:0)
+d=Table(size=(10,10),default= lambda x,y:x*y)
+
+    
 class Plan:
 
-    def __init__(self,default=0):
+    def __init__(self,inter=(-5,-5,5,5),default=lambda x,y:(x,y)):
         self.default=default
-        self.list=[[self.default]]
-        self.xinter=[0,0]
-        self.yinter=[0,0]
+        self.list=[]
+        
+        self.ouest,self.nord,self.est,self.sud=0,0,0,0
 
+        self.addlineDown(abs(inter[3]))
+        self.addlineUp(abs(inter[1]))
+        self.addcolumnLeft(abs(inter[0]))
+        self.addcolumnRight(abs(inter[2]))
+        
+        
     def __getitem__(self,val):
         if type(val)==tuple:
-            return self.list[val[1]][abs(self.xinter[0])+val[0]]
+            return self.list[val[1]][abs(self.ouest)+val[0]]
         else:
             print(f"Bad index for type Plan: {val}")
+            
+    
+        
+    def addcolumnRight(self,nb=1):
+        for index,y in enumerate(range(self.nord,self.sud)):
+            self.list[index]=self.list[index]+[self.default(x,y) for x in range(self.est,self.est+nb)]
+        self.est+=nb
+
+    def addcolumnLeft(self,nb=1):
+        for index,y in enumerate(range(self.nord,self.sud)):
+            self.list[index]=[self.default(x,y) for x in range(self.ouest-nb,self.ouest)]+self.list[index]
+        self.ouest-=nb
+
+    def addlineUp(self,nb=1):
+        self.list=[[self.default(x,y) for x in range(self.ouest,self.est)] for y in range(self.nord-nb,self.nord)]+self.list
+        self.nord-=nb
+
+    def addlineDown(self,nb):
+        self.list=self.list+[[self.default(x,y) for x in range(self.ouest,self.est)] for y in range(self.sud,self.sud+nb)]
+        self.sud+=nb
+        
     def __setitem__(self,pos,value):
         x,y=pos
-        
-        if not self.xinter[0]<x<self.xinter[1]:
-            if x<self.xinter[0]:
-                for ligne in range(len(self.list)):
-                    self.list[ligne]=[self.default for to_add_before in range(abs(x-self.xinter[0]))]+self.list[ligne]
-                self.xinter[0]-=abs(x-self.xinter[0])
-            if self.xinter[1]<x:
-                for ligne in range(len(self.list)):
-                    self.list[ligne]=self.list[ligne]+[self.default for to_add_after in range(x-self.xinter[1])]
-                self.xinter[1]+=abs(x-self.xinter[1])+1
+        if not self.ouest<x<self.est:
+            if x<self.ouest:
+                self.addcolumnLeft(abs(x-self.ouest))
+            if self.est<x:
+                self.addcolumnRight(abs(x-self.est))
                 
-        if not self.yinter[0]<y<self.yinter[1]:
-            emptyline=[self.default for x in range(abs(self.xinter[0])+self.xinter[1])]
-            if y<self.yinter[0]:
-                self.list=[emptyline[:] for y in range(abs(y-self.yinter[0]))]+self.list
-                self.yinter[0]-=abs(y-self.yinter[0])
-            if self.yinter[1]<y:
-                self.list=self.list+[emptyline[:] for y in range(abs(y-self.yinter[1]))]
-                self.yinter[1]+=abs(y-self.yinter[1])
-        self.list[abs(self.yinter[0])+y][abs(self.xinter[0])+x]=value
+        if not self.nord<y<self.sud:
+            if y<self.nord:
+                self.addlineUp(abs(y-self.nord))
+            if self.sud<y:
+                self.addlineDown(abs(y-self.sud))
+        self.list[abs(self.nord)+y][abs(self.ouest)+x]=value
+    
     def __repr__(self):
         t=""
-        for y in self.list:t+=str(y)+"\n"
-        #t+=f"Width: {self.xmax} items Height: {self.ymax} items"
+        for y in self.list:
+            t+=str(y)+"\n"
         return t
     def __iter__(self):
-        self.av=[self.xinter[0],self.yinter[0]]
+        self.av=[self.ouest,self.nord]
         return self
     def __next__(self):
         if self.av=="end":
@@ -93,14 +142,13 @@ class Plan:
         else:
             res=self[self.av[0],self.av[1]],self.av[:]
             self.av[0]+=1
-            if self.av[0]>self.xinter[1]:
+            if self.av[0]>self.est:
                 self.av[1]+=1
-                if self.av[1]>self.yinter[1]:
+                if self.av[1]>self.sud:
                     self.av='end'
         return res
             
 
-S=Plan(None)
-T=Table()
-T[10,10]="bout"
+S=Plan()
+
 

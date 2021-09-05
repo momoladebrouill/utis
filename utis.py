@@ -24,62 +24,41 @@ class Pos:
 
 
 class Vec:
-    def __init__(self,**args):
-        """duo: x=0 + y=0 ou angle=0 + long=1 ou a=Pos() + b=Pos()
-        Un super vecteur"""
-        self._x=args.get('x')
-        self._y=args.get('y')
-        self._angle=args.get('angle')
-        self._long=args.get('long')
-        
-        if self._x!=None and self._y!=None:
-            self.__set_polaire()
+    def __init__(self,x=None,y=None,angle=None,long=None,a=None,b=None):
+        self.x=0
+        self.y=0
+        if x!=None and y!=None:
+            self.x=x
+            self.y=y
+        elif angle!=None and long!=None:
+            self.angle=angle
+            self.long=long
             
-        elif self._angle!=None and self._long!=None:
-            self.__set_cartesian()
-            
-        elif type(args.get("a"))==Pos and type(args.get("b"))==Pos:
-            self._x=args.get("a").x-args.get("b").x
-            self._y=args.get("a").y-args.get("b").y
-            self.__set_polaire()
-            
-        else:
-            raise TypeError("Arguments must be x= and y= or angle= and long= or a= and b=")
-            
+        elif type(a)==Pos and type(b)==Pos:
+            self.x=a.x-b.x
+            self.y=a.y-b.y
     
     def __set_angle(self,val):
-        self._angle=val
-        self.__set_cartesian()
-
+        long=self.long
+        self.x=round(math.cos(val)*long,9)
+        self.y=round(math.sin(val)*long,9)
+        
     def __set_long(self,val):
-        self._long=val
-        self.__set_cartesian()
-
-    def __set_x(self,val):
-        self._x=val
-        self.__set_polaire()
-    def __set_y(self,val):
-        self._y=val
-        self.__set_polaire()
-    def __set_by_iter(self,tup:iter):
-        self._x=tup[0]
-        self._y=tup[1]
-        self.__set_polaire()
-    def __set_cartesian(self):
-        self._x=round(math.cos(self.angle)*self.long,9)
-        self._y=round(math.sin(self.angle)*self.long,9)
+        angle=self.angle
+        self.x=round(math.cos(angle)*val,9)
+        self.y=round(math.sin(angle)*val,9)
         
-    def __set_polaire(self):
-        self._long=math.sqrt(self.x**2+self.y**2)
-        if self.long==0:
-            self._angle=0
-        else:
-            self._angle=math.atan2(self.y,self.x)+math.pi
-        
-    def __getitem__(self,ind):
-        return [self.x,self.y,self.angle,self.long][ind]
+    angle=property(lambda self:0 if self.long==0 else math.atan2(self.y,self.x)+math.pi,__set_angle)
+    long=property(lambda self: math.sqrt(self.x**2+self.y**2),__set_long)
+    
     def pointtoo(self,form:Pos,to:Pos):
         self.angle=form.angle(to)
+    #x=property(lambda self:self._x,lambda self,val: self._x=val)
+    #y=property(lambda self:self._y,lambda self,val: self._y=val)
+    #c=property(lambda self:(self.x,self.y),__set_by_iter,doc="Tuple cartesien (x,y)")
+    
+    def __getitem__(self,ind):
+        return [self.x,self.y][ind]
         
     def __add__(self,other):
         return Vec(x=self.x+other.x,y=self.y+other.y)
@@ -88,28 +67,23 @@ class Vec:
         return Vec(x=self.x-other.x,y=self.y-other.y)
     
     def __mul__(self,num):
-        if type(num)==Vec:
-            return self.x*num.x+self.y*num.y
-        else:
-            return Vec(x=self.x*num,y=self.y*num)
+        return self.x*num.x+self.y*num.y if type(num)==Vec else Vec(x=self.x*num,y=self.y*num)
     
     def __truediv__(self,num:Union[int,float]):
         return Vec(x=self.x/num,y=self.y/num)
+    
     def __floordiv__(self,num:Union[int,float]):
         return Vec(x=int(self.x/num),y=int(self.y/num))
+    
     def __repr__(self):
-        return str((self.x,self.y,self.long,self.angle))
+        return f"{self.x=} {self.y=}"
     __rmul__=__mul__
     __radd__=__add__
-    angle=property(lambda self: self._angle,__set_angle)
-    long=property(lambda self: self._long,__set_long)
-    x=property(lambda self:self._x,__set_x)
-    y=property(lambda self:self._y,__set_y)
-    c=property(lambda self:(self.x,self.y),__set_by_iter,doc="Tuple cartesien (x,y)")
+    
     
 if __name__=="__main__":
-    a=Vec(x=1,y=0)
-    b=Vec(long=1,angle=math.tau)
+    a=Vec(x=1,y=1)
+    #b=Vec(long=1,angle=math.tau)
     c=Pos(0,10)
     d=Pos(20,20)
             
