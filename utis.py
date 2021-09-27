@@ -236,6 +236,11 @@ class Plan:
 
 
 class Complex:
+    def __new__(cls,a,b):
+        if b==0:
+            return type(a).__new__(type(a),a)
+        else:
+            return super(Complex,cls).__new__(cls)
     def __init__(self, Re, Im):
         if Im:
             self.re = Re
