@@ -1,7 +1,5 @@
 """Stuufs utils pour momo, je sais même pas si je vais m'en serveir"""
 import math
-from typing import Union
-
 
 class Pos:
     def __init__(self, x, y):
@@ -72,10 +70,10 @@ class Vec:
     def __mul__(self, num):
         return self.x*num.x+self.y*num.y if type(num) == Vec else Vec(x=self.x*num, y=self.y*num)
 
-    def __truediv__(self, num: Union[int, float]):
+    def __truediv__(self, num: int | float):
         return Vec(x=self.x/num, y=self.y/num)
 
-    def __floordiv__(self, num: Union[int, float]):
+    def __floordiv__(self, num: int| float):
         return Vec(x=int(self.x/num), y=int(self.y/num))
 
     def __repr__(self):
