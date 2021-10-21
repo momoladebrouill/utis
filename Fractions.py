@@ -1,5 +1,7 @@
-class Frac():
+class Frac(float):
+    
     def __init__(self,a:int,b:int):
+        super().__init__()
         self.a=a
         self.b=b
         if self.b==0: raise ZeroDivisionError
