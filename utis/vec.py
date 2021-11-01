@@ -70,10 +70,10 @@ class Vec:
     def __mul__(self, num):
         return self.x*num.x+self.y*num.y if type(num) == Vec else Vec(x=self.x*num, y=self.y*num)
 
-    def __truediv__(self, num: int | float):
+    def __truediv__(self, num):
         return Vec(x=self.x/num, y=self.y/num)
 
-    def __floordiv__(self, num: int| float):
+    def __floordiv__(self, num):
         return Vec(x=int(self.x/num), y=int(self.y/num))
 
     def __repr__(self):

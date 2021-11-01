@@ -3,7 +3,7 @@ import codecs
 import os
 
 
-VERSION = '0.6.9420'
+VERSION = '1'
 DESCRIPTION = 'Potits trucs utils on ne sait jamais'
 LONG_DESCRIPTION = """
 Plein de trucs sympa, voir le repo github pour plus de datails
