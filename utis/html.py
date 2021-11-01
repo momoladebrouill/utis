@@ -26,7 +26,6 @@ class Balise:
             nb += 1
             lieu = lieu.parent
         return nb
-
-a=Balise('main',None)
-Balise('test',a)
-...
+if __name__=="__main__":
+    a=Balise('main',None)
+    Balise('test',a)

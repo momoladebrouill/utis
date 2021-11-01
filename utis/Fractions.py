@@ -31,5 +31,5 @@ class Frac(float):
         long=max(len(up),len(down))+2
         upsace,downsace=" "*((long-len(up))//2)," "*((long-len(down))//2)
         return upsace+up+upsace+"\n"+"-"*long+"\n"+downsace+down+downsace
-    
-a=Frac(1,2)
+if __name__=="__main__":
+    a=Frac(1,2)

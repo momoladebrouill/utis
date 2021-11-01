@@ -21,5 +21,6 @@ class Ant():
     
     def __repr__(self):
         return f'''{"|"*(self.legs//2)}\n{"0"*max(self.legs//2,self.legs-self.legs//2)}{"."*self.mandi}{"-"*self.antennes}\n{"|"*(self.legs-self.legs//2)}'''
-mimi=Ant()
-stephane=Ant(4,2,5)
+if __name__=="__main__":
+    mimi=Ant()
+    stephane=Ant(4,2,5)
