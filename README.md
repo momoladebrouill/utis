@@ -2,7 +2,7 @@
 # UTIS
 
 Un pseudo module pour gérer les vecteurs et les positions et les angles
-
+[![Upload Python Package](https://github.com/momoladebrouill/utis/actions/workflows/python-publish.yml/badge.svg)](https://github.com/momoladebrouill/utis/actions/workflows/python-publish.yml)
 ### antsfight
 Play with ants to learn the basics of OOP !
 ### Fractions
